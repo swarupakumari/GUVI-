@@ -1,7 +1,13 @@
 <?php
-$conn = new mysqli("localhost", "root", "", "user_auth", 3307);
+$conn = new mysqli(
+    getenv("MYSQLHOST"),
+    getenv("MYSQLUSER"),
+    getenv("MYSQLPASSWORD"),
+    getenv("MYSQLDATABASE"),
+    getenv("MYSQLPORT")
+);
 
 if ($conn->connect_error) {
-    die("Connection failed");
+    die("Connection failed: " . $conn->connect_error);
 }
 ?>
