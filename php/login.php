@@ -1,10 +1,12 @@
 <?php
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
-$email = $_POST['email'];
-$password = $_POST['password'];
+
 include 'config.php';
-//include 'redis.php';
+
+// Prevent undefined warnings
+$email = $_POST['email'] ?? '';
+$password = $_POST['password'] ?? '';
 
 // ✅ Prepared Statement
 $stmt = $conn->prepare("SELECT id, password FROM users WHERE email=?");
@@ -17,15 +19,13 @@ if ($row = $result->fetch_assoc()) {
 
     if (password_verify($password, $row['password'])) {
 
-        // 🔥 Generate session ID
+        // ✅ Generate session ID (store in browser localStorage)
         $session_id = bin2hex(random_bytes(16));
-
-        // 🔥 Store in Redis
-        $redis->set("session:$session_id", $row['id']);
 
         echo json_encode([
             "status" => "success",
-            "session_id" => $session_id
+            "session_id" => $session_id,
+            "user_id" => $row['id']
         ]);
 
     } else {
@@ -35,4 +35,7 @@ if ($row = $result->fetch_assoc()) {
 } else {
     echo json_encode(["status" => "fail"]);
 }
+
+$stmt->close();
+$conn->close();
 ?>

@@ -1,17 +1,24 @@
 <?php
 include 'config.php';
 
-$name = $_POST['name'];
-$email = $_POST['email'];
-$password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+// Handle empty POST safely
+$name = $_POST['name'] ?? '';
+$email = $_POST['email'] ?? '';
+$password = $_POST['password'] ?? '';
 
-// ✅ Prepared Statement (MANDATORY)
-$stmt = $conn->prepare("INSERT INTO users (name, email, password) VALUES (?, ?, ?)");
-$stmt->bind_param("sss", $name, $email, $password);
+// Hash password
+$hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+
+// ✅ Insert WITHOUT id (let DB handle it)
+$stmt = $conn->prepare("INSERT INTO users (id, name, email, password) VALUES (NULL, ?, ?, ?)");
+$stmt->bind_param("sss", $name, $email, $hashedPassword);
 
 if ($stmt->execute()) {
-    echo "Registered Successfully";
+    echo json_encode(["status" => "success", "message" => "Registered Successfully"]);
 } else {
-    echo "Error (Email may already exist)";
+    echo json_encode(["status" => "error", "message" => "Email already exists"]);
 }
+
+$stmt->close();
+$conn->close();
 ?>
