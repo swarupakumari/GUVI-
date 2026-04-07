@@ -1,10 +1,18 @@
 <?php
 require __DIR__ . '/../vendor/autoload.php';
 
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
-$dotenv->load();
+$mongo_uri = getenv("MONGO_URI");
 
-$client = new MongoDB\Client($_ENV['MONGO_URI']);
+try {
+    $client = new MongoDB\Client($mongo_uri);
 
-$collection = $client->mydb->profiles;
+    // database
+    $db = $client->selectDatabase("mydb");
+
+    // collection
+    $collection = $db->profiles;
+
+} catch (Exception $e) {
+    die("MongoDB Error: " . $e->getMessage());
+}
 ?>
