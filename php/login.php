@@ -3,8 +3,8 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 include 'config.php';
+include 'redis.php';   // 🔥 ADD THIS
 
-// Prevent undefined warnings
 $email = $_POST['email'] ?? '';
 $password = $_POST['password'] ?? '';
 
@@ -19,13 +19,15 @@ if ($row = $result->fetch_assoc()) {
 
     if (password_verify($password, $row['password'])) {
 
-        // ✅ Generate session ID (store in browser localStorage)
+        // 🔥 Generate session ID
         $session_id = bin2hex(random_bytes(16));
+
+        // 🔥 STORE SESSION IN REDIS (IMPORTANT)
+        $redis->set("session:$session_id", $row['id']);
 
         echo json_encode([
             "status" => "success",
-            "session_id" => $session_id,
-            "user_id" => $row['id']
+            "session_id" => $session_id
         ]);
 
     } else {

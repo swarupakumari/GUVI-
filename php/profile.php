@@ -1,28 +1,31 @@
 <?php
-// include 'redis.php';  // ❌ Redis disabled for now
+include 'redis.php';   // ✅ Redis enabled
 include 'mongo.php';
 
-// 🔴 Redis session part (disabled for now)
-/*
-$session_id = $_POST['session_id'];
+// 🔥 Get session
+$session_id = $_POST['session_id'] ?? '';
+
 $user_id = $redis->get("session:$session_id");
 
 if (!$user_id) {
-    echo "Unauthorized";
+    echo json_encode([
+        "status" => "fail",
+        "message" => "Unauthorized"
+    ]);
     exit;
 }
-*/
 
-// ✅ Get form data safely
+// ✅ Get form data
 $age = $_POST['age'] ?? '';
 $dob = $_POST['dob'] ?? '';
 $contact = $_POST['contact'] ?? '';
 
 try {
-    // ✅ Save data in MongoDB
+    // ✅ Save data in MongoDB (linked with user_id)
     $collection->updateOne(
-        ["contact" => $contact],  // using contact as unique identifier
+        ["user_id" => (int)$user_id],
         ['$set' => [
+            "user_id" => (int)$user_id,
             "age" => $age,
             "dob" => $dob,
             "contact" => $contact,
