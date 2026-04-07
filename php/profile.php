@@ -1,31 +1,45 @@
 <?php
-//include 'redis.php';
+// include 'redis.php';  // ❌ Redis disabled for now
 include 'mongo.php';
 
+// 🔴 Redis session part (disabled for now)
+/*
 $session_id = $_POST['session_id'];
-
-// 🔥 Check Redis session
 $user_id = $redis->get("session:$session_id");
 
 if (!$user_id) {
     echo "Unauthorized";
     exit;
 }
+*/
 
-// Save profile data
-$age = $_POST['age'];
-$dob = $_POST['dob'];
-$contact = $_POST['contact'];
+// ✅ Get form data safely
+$age = $_POST['age'] ?? '';
+$dob = $_POST['dob'] ?? '';
+$contact = $_POST['contact'] ?? '';
 
-$collection->updateOne(
-    ["user_id" => (int)$user_id],
-    ['$set' => [
-        "age" => $age,
-        "dob" => $dob,
-        "contact" => $contact
-    ]],
-    ["upsert" => true]
-);
+try {
+    // ✅ Save data in MongoDB
+    $collection->updateOne(
+        ["contact" => $contact],  // using contact as unique identifier
+        ['$set' => [
+            "age" => $age,
+            "dob" => $dob,
+            "contact" => $contact,
+            "updated_at" => new MongoDB\BSON\UTCDateTime()
+        ]],
+        ["upsert" => true]
+    );
 
-echo "Profile Saved Successfully";
+    echo json_encode([
+        "status" => "success",
+        "message" => "Profile Saved Successfully"
+    ]);
+
+} catch (Exception $e) {
+    echo json_encode([
+        "status" => "fail",
+        "error" => $e->getMessage()
+    ]);
+}
 ?>
