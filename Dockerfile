@@ -1,18 +1,13 @@
-FROM php:8.1-apache
+FROM php:8.1-cli
 
-# Install mysqli extension
+# Install mysqli
 RUN docker-php-ext-install mysqli
 
-# Enable Apache mod_rewrite
-RUN a2enmod rewrite
-
 # Set working directory
-WORKDIR /var/www/html
+WORKDIR /app
 
-# Copy project files
-COPY . /var/www/html/
+# Copy files
+COPY . /app
 
-# Fix permissions
-RUN chown -R www-data:www-data /var/www/html
-
-EXPOSE 80
+# Start PHP server on Railway port
+CMD php -S 0.0.0.0:$PORT -t /app
