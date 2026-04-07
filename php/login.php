@@ -4,7 +4,7 @@ ini_set('display_errors', 1);
 $email = $_POST['email'];
 $password = $_POST['password'];
 include 'config.php';
-include 'redis.php';
+//include 'redis.php';
 
 // ✅ Prepared Statement
 $stmt = $conn->prepare("SELECT id, password FROM users WHERE email=?");

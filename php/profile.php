@@ -1,5 +1,5 @@
 <?php
-include 'redis.php';
+//include 'redis.php';
 include 'mongo.php';
 
 $session_id = $_POST['session_id'];
