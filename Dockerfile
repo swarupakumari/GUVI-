@@ -12,6 +12,9 @@ RUN docker-php-ext-install mysqli
 # 🔥 Install MongoDB extension
 RUN pecl install mongodb-1.15.0 && docker-php-ext-enable mongodb
 
+# 🔥 Install Redis extension (IMPORTANT FIX)
+RUN pecl install redis && docker-php-ext-enable redis
+
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
@@ -21,7 +24,7 @@ WORKDIR /app
 # Copy project files
 COPY . /app
 
-# Install composer dependencies (VERY IMPORTANT)
+# Install composer dependencies
 RUN composer install
 
 # Start PHP server
