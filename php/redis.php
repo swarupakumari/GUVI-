@@ -1,4 +1,15 @@
 <?php
+$redis_url = getenv('REDIS_URL');
+
+$parts = parse_url($redis_url);
+
 $redis = new Redis();
-$redis->connect('127.0.0.1', 6379);
+
+// Connect to Railway Redis
+$redis->connect($parts['host'], $parts['port']);
+
+// Authenticate if needed
+if (isset($parts['pass'])) {
+    $redis->auth($parts['pass']);
+}
 ?>
