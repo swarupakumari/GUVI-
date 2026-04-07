@@ -7,8 +7,26 @@ $("#registerForm").submit(function(e) {
         data: $(this).serialize(),
 
         success: function(res) {
-            alert(res);
-            window.location = "login.html";
+            console.log("RAW:", res);
+
+            try {
+                let data = JSON.parse(res);
+
+                if (data.status === "success") {
+                    alert("Registered Successfully ✅");
+                    window.location = "login.html";
+                } else {
+                    alert("Error: " + (data.message || "Registration failed"));
+                }
+
+            } catch (e) {
+                console.log("JSON ERROR:", e);
+                alert(res); // fallback
+            }
+        },
+
+        error: function() {
+            alert("Server error ❌");
         }
     });
 });
